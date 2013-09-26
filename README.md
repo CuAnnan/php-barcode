@@ -1,17 +1,35 @@
 php-barcode
 ===========
 
-Source code for the article "How To Create Barcodes in PHP" found at: 
-http://davidscotttufts.com/2009/03/31/how-to-create-barcodes-in-php/
+Class based version of https://github.com/davidscotttufts/php-barcode/
 
-This script that generates barcodes in four barcode formats including
-Code 128, Code 39, Code 2of5, and Codabar. With a little over 100 lines
-of code you have the options of “vertical” or “horizontal” display,
-varying barcode heights, and one of four barcode formats. It does require
-the GD Library to be installed as a module in PHP.
+The abstract Barcode class is responsible for all of the work except converting
+the plain text to encoded characters. The individual barcode type Classes 
+implement the convertText method which generates the string of encoded text for
+barcodifying.
 
 Usage:
-&lt;img alt="testing" src="barcode.php?text=testing" /&gt;
+```php
+<?php
+spl_autoload_register(
+	function($class)
+	{
+		$classParts = explode('\\', $class);
+		$relativePath = implode('/', $classParts).'.class.php';
+		$path = 'classes/'.$relativePath;
+		if(is_file($path))
+		{
+			include $path;
+			return true;
+		}
+		return false;
+	}
+);
 
-Result:
-<img alt="testing" src="http://davidscotttufts.com/code/barcode.php?text=testing" />
+$characterCodePrefix = "309";
+$characterCode = "108";
+$code = $characterCodePrefix.'-'.str_pad($characterCode, 6, '0', STR_PAD_LEFT);
+$generator = new \Barcode\CodaBarBarcode($code);
+$generator->displayPNG();
+?>
+```
